@@ -12,17 +12,24 @@ namespace WindowsFormsOxyPlotZoom
 {
     public partial class Form1 : Form
     {
-        class MyValue : IComparable {
+        class MyValue : IComparable
+        {   
+            //I am using a small helper class for my date/value pairs
+            //providing an IComparable Interface for using BinarySearch
+            //in the x-axis change event
             public DateTime Date { get; set; }
             public double Value { get; set; }
-            public MyValue(DateTime d) {
+            public MyValue(DateTime d) 
+            {
                 Date = new DateTime(d.Year, d.Month, d.Day);
             }
-            public MyValue(DateTime d, double v) {
+            public MyValue(DateTime d, double v) 
+            {
                 Date = new DateTime(d.Year, d.Month, d.Day);
                 Value = v;
             }
-            int IComparable.CompareTo(object to) {
+            int IComparable.CompareTo(object to) 
+            {
                 return Date.CompareTo(((MyValue)to).Date);
             }
         }
@@ -33,20 +40,23 @@ namespace WindowsFormsOxyPlotZoom
         PlotModel plotModel;
         LineSeries lineSeries;
 
-        public Form1() {
+        public Form1() 
+        {
             InitializeComponent();
 
             myValues = new List<MyValue>();
             DateTime startDate = new DateTime(2000, 1, 1);
             double startValue = 100;
             Random r = new Random();
-            for (int i = 0; i < 1000; i++, startDate = startDate.AddDays(1), startValue += (r.NextDouble() - 0.5)) {
+            for (int i = 0; i < 1000; i++, startDate = startDate.AddDays(1), startValue += (r.NextDouble() - 0.5)) 
+            {
                 myValues.Add(new MyValue(startDate, startValue));
             }
 
             plotModel = new PlotModel("Random chart");
 
-            xAxisDateTime = new DateTimeAxis() { 
+            xAxisDateTime = new DateTimeAxis() 
+            { 
                 IntervalType = DateTimeIntervalType.Auto, 
                 MinorIntervalType = DateTimeIntervalType.Days, 
                 MajorGridlineStyle = LineStyle.Solid, 
@@ -62,18 +72,21 @@ namespace WindowsFormsOxyPlotZoom
             //calling user defined event on change
             xAxisDateTime.AxisChanged += xAxisDateTime_AxisChanged;
 
-            yAxisValues = new LinearAxis() { 
+
+            yAxisValues = new LinearAxis() 
+            { 
                 MajorGridlineStyle = LineStyle.Solid, 
-                MinorGridlineStyle = LineStyle.Dot 
+                MinorGridlineStyle = LineStyle.Solid 
             };
 
             plotModel.Axes.Add(xAxisDateTime);
             plotModel.Axes.Add(yAxisValues);
 
-            lineSeries = new LineSeries {
+            lineSeries = new LineSeries 
+            {
                 Title = "Values",
                 Color = OxyColor.FromArgb(255, 78, 154, 6),
-                MarkerType = MarkerType.None,
+                MarkerType = MarkerType.Diamond,
                 StrokeThickness = 1,
                 DataFieldX = "Date",
                 DataFieldY = "Value",
@@ -85,7 +98,8 @@ namespace WindowsFormsOxyPlotZoom
 
         }
 
-        void xAxisDateTime_AxisChanged(object sender, AxisChangedEventArgs e) {
+        void xAxisDateTime_AxisChanged(object sender, AxisChangedEventArgs e) 
+        {
             DateTimeAxis axis = sender as DateTimeAxis;
 
             //save the current min/max date values
@@ -105,7 +119,8 @@ namespace WindowsFormsOxyPlotZoom
             if (idxMax < 0) idxMax = ~idxMax;
 
             //find the corresponding min/max values in the selected intervall
-            for (int i = idxMin; i < idxMax; i++) {
+            for (int i = idxMin; i < idxMax; i++) 
+            {
                 minValue = Math.Min(minValue, myValues[i].Value);
                 maxValue = Math.Max(maxValue, myValues[i].Value);
             }
